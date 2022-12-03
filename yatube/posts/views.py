@@ -1,14 +1,14 @@
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView
 
 from yatube.settings import POSTS_ON_PAGE
 
 from .models import Group, Post
 from .forms import PostForm
+
 
 def index(request):
     '''
@@ -80,9 +80,7 @@ class CreateNewPost(CreateView):
     form_class = PostForm
     template_name = 'posts/create_post.html'
     success_url = reverse_lazy('profile/<str:username>/')
-        
+
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
-
-    
