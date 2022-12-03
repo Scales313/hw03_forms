@@ -1,9 +1,9 @@
 import pytest
 from django import forms
-from posts.forms import PostForm
 from posts.models import Post
 
 from tests.utils import get_field_from_context
+from yatube.forms import PostForm
 
 
 class TestPostView:
