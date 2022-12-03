@@ -34,6 +34,9 @@
           <p>
            {{post.text}}
           </p>
+          <a class="btn  btn-primary" href="{% url 'posts:post_edit' post.id %}">
+            Редактировать запись
+          </a>
         </article>
       </div> 
     </div>

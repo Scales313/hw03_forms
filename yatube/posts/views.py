@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.shortcuts import get_object_or_404, redirect, render
 
 from yatube.settings import POSTS_ON_PAGE
 
@@ -76,11 +74,46 @@ def post_detail(request, post_id):
     return render(request, 'posts/post_detail.html', context)
 
 
-class CreateNewPost(CreateView):
-    form_class = PostForm
-    template_name = 'posts/create_post.html'
-    success_url = reverse_lazy('profile/<str:username>/')
+"""class CreateNewPost(CreateView):
+#   form_class = PostForm
+#    template_name = 'posts/create_post.html'
+#    success_url = reverse_lazy('profile/<str:username>/')
+#
+#    def form_valid(self, form):
+#        form.instance.author = self.request.user
+#        return super().form_valid(form)
+"""
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
+
+def post_create(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid:
+            form.instance.author = request.user
+            form.save()
+            return redirect('posts:profile', username=request.user)
+    form = PostForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'posts/create_post.html', context)
+
+
+def post_edit(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if post.author != request.user:
+        return redirect('post:post_detail', post.pk)
+    form = PostForm(request.POST, instance=post)
+    if request.method == 'POST':
+        if form.is_valid():
+            post = form.save()
+            post.author = request.user
+            post.save()
+            return redirect('post:post_detail', post.pk)
+    context = {
+        'form': form,
+        'post': post,
+        'is_edit': True,
+    }
+
+    return render(request, 'posts/create_post.html', context)
