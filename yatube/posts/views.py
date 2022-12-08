@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from yatube.settings import POSTS_ON_PAGE
 
-from .models import Group, Post
 from .forms import PostForm
+from .models import Group, Post
 
 
 def index(request):
@@ -88,7 +88,7 @@ def post_create(request):
     return render(request, 'posts/create_post.html', context)
 
 
-def post_edit(request, post_id):
+'''def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if post.author != request.user:
         return redirect('post:post_detail', post.pk)
@@ -104,5 +104,47 @@ def post_edit(request, post_id):
         'post': post,
         'is_edit': True,
     }
+    return render(request, 'posts/create_post.html', context)'''
 
+'''def post_edit(request, post_id):
+    is_edit = get_object_or_404(Post, id=post_id)
+    group = Group.objects.all()
+    if request.method == 'GET':
+        if request.user != is_edit.author:
+            return redirect('post:post_detail', post_id = is_edit.id)
+        else:
+            form = PostForm()
+        context = {
+            'form': form,
+            'is_edit': is_edit,
+            'group': group,
+            'post_id': post_id,
+        }
+        return render(request, 'post/create_post.html', context)
+    else:
+        form = PostForm(request.POST or None)
+        if form.is_valid():
+            form.instance.author = is_edit.author
+            form.save()
+            return redirect('post:post_edit', post_id=is_edit.id)
+        return render(request, 'post/create_post.html', context)'''
+
+
+def post_edit(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    is_edit = True
+    if request.method == 'GET':
+        if request.user != post.author:
+            return redirect('posts:post_detail', post_id=post.id)
+        form = PostForm(instance=post)
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+        return redirect('posts:post_detail', post_id=post.id)
+    context = {
+        'form': form,
+        'post': post,
+        'is_edit': is_edit
+        }
     return render(request, 'posts/create_post.html', context)
