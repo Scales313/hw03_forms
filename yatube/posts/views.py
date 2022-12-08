@@ -75,9 +75,12 @@ def post_detail(request, post_id):
 
 
 def post_create(request):
+    '''
+    the function create new post
+    '''
     if request.method == "POST":
         form = PostForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             form.instance.author = request.user
             form.save()
             return redirect('posts:profile', username=request.user)
@@ -89,6 +92,9 @@ def post_create(request):
 
 
 def post_edit(request, post_id):
+    '''
+    the function edit your post
+    '''
     post = get_object_or_404(Post, id=post_id)
     is_edit = True
     if request.method == 'GET':
