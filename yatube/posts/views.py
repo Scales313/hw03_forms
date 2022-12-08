@@ -87,7 +87,7 @@ def post_create(request):
     }
     return render(request, 'posts/create_post.html', context)
 
-    
+
 def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     is_edit = True
@@ -104,5 +104,5 @@ def post_edit(request, post_id):
         'form': form,
         'post': post,
         'is_edit': is_edit
-        }
+    }
     return render(request, 'posts/create_post.html', context)
