@@ -14,7 +14,10 @@ class Group(models.Model):
 
 
 class Post(models.Model):
-    text = models.TextField(max_length=10000)
+    text = models.TextField(
+        max_length=10000,
+        verbose_name='Текст поста'
+    )
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
         User,
@@ -25,7 +28,8 @@ class Post(models.Model):
         Group,
         blank=True, null=True,
         on_delete=models.SET_NULL,
-        related_name='posts'
+        related_name='posts',
+        verbose_name='Группа'
     )
 
     def __str__(self):
