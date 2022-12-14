@@ -1,19 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
-
-from yatube.settings import POSTS_ON_PAGE
 
 from .forms import PostForm
 from .models import Group, Post
-
-
-def pageobj(posts, request):
-    paginator = Paginator(posts, POSTS_ON_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return page_obj
+from .utils import pageobj
 
 
 def index(request):
@@ -51,13 +42,10 @@ def profile(request, username):
     '''
     author = get_object_or_404(User, username=username)
     posts = author.posts.all()
-    posts_count = author.posts.count()
     page_obj = pageobj(posts, request)
     context = {
         'author': author,
-        'posts': posts,
         'page_obj': page_obj,
-        'posts_count': posts_count,
     }
     return render(request, 'posts/profile.html', context)
 
@@ -67,10 +55,8 @@ def post_detail(request, post_id):
     the function displays the selected post
     '''
     post = get_object_or_404(Post, pk=post_id)
-    posts_count = post.author.posts.count()
     context = {
         'post': post,
-        'posts_count': posts_count,
     }
     return render(request, 'posts/post_detail.html', context)
 
@@ -83,9 +69,9 @@ def post_create(request):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            author = form.save(commit=False)
-            author.author = request.user
-            author.save()
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
             return redirect('posts:profile', username=request.user)
     form = PostForm()
     context = {
